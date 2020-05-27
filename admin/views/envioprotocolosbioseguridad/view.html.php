@@ -5,7 +5,7 @@ jimport('joomla.application.component.view');
 
 	class EnvioprotocolosbioseguridadViewEnvioprotocolosbioseguridad extends JViewLegacy {
 		public function display($tpl = null) {
-			$base = str_replace('\\','/',JPATH_BASE)."/";
+			/*$base = str_replace('\\','/',JPATH_BASE)."/";
 			$base = str_replace('administrator/','',$base);
 			$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
 			$file = file_get_contents($ciudades_url);
@@ -27,7 +27,7 @@ jimport('joomla.application.component.view');
 			parent::display($tpl);
 
 			// Set the document
-			$this->setDocument();
+			$this->setDocument();*/
 		}
 
 		protected function setDocument(){
