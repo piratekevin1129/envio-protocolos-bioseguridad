@@ -28,38 +28,28 @@ defined('_JEXEC') or die('Restricted access');
 		<thead>
 			<tr>
 				<th class="nowrap center" width="2%"><a>Id</a></th>
-				<th class="nowrap" width="20%"><a>Nombres apellidos</a></th>
+				<th class="nowrap" width="16%"><a>Nombre Legal</a></th>
+				<th class="nowrap" width="16%"><a>Nombre Comercial</a></th>
 				<th class="nowrap" width="10%"><a>Documento</a></th>
+				<th class="nowrap" width="16%"><a>Sector</a></th>
+				<th class="nowrap" width="10%"><a>Correo</a></th>
 				<th class="nowrap" width="10%"><a>Teléfono</a></th>
-				<th class="nowrap" width="11%"><a>Correo</a></th>
-				<th class="nowrap" width="16%"><a>Área prestación de servicios</a></th>
-				<th class="nowrap" width="11%"><a>Ocupación</a></th>
+				<th class="nowrap" width="10%"><a>Dirección</a></th>				
 				<th class="nowrap" width="10%"><a>Fecha registro</a></th>
-				<th class="nowrap" width="10%"><a>Dirección IP</a></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php foreach($this->datos as $dato){?>
 			<tr>
 				<td><?php echo $dato->id?></td>
-				<td><?php echo $dato->nombres_apellidos?></td>
+				<td><?php echo $dato->nombre_comercial?></td>
+				<td><?php echo $dato->nombre_legal?></td>
 				<td><?php echo $dato->tipo_documento.'.'.$dato->numero_documento?></td>
-				<td><?php echo $dato->numero_telefono?></td>
+				<td><?php echo $this->sectores_data[(int)$dato->sector_economico]; ?></td>
 				<td><?php echo $dato->correo_electronico?></td>
-				<td>
-					<?php 
-					$area_name = "";
-					if($dato->area_prestacion!='3'){
-						$area_name = $this->areas[(int)$dato->area_prestacion];
-					}else{
-						$area_name = $dato->area_prestacion_txt;
-					}
-					echo $area_name;
-					?>
-				</td>
-				<td><?php echo $dato->ocupacion?></td>
+				<td><?php echo $dato->numero_telefono?></td>
+				<td><?php echo $dato->direccion_correspondencia?></td>				
 				<td><?php echo $dato->fecha_registro?></td>
-				<td><?php echo $dato->ipadress?></td>
 			</tr>
 			<?php } ?>
 		</tbody>
