@@ -151,8 +151,8 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		$newname = checkComillas(JRequest::getVar('nombre_txt','','post'));
 
 		$from = 'jsanchezy@sura.com.co';
-		//$to = 'jsanchezy@sura.com.co';
-		$to = 'desarrollo3@virtualcolors.com';
+		$to = 'jsanchezy@sura.com.co';
+		//$to = 'desarrollo3@virtualcolors.com';
 		$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
 		$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
 

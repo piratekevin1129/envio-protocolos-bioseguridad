@@ -257,7 +257,7 @@ var sectores_data = null
 window.onload = function(){
     //resizeContainer()
     $.ajax ({ 
-        url: 'components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json', 
+        url: '/components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json', 
         method: "GET",
         success: function(response){
             //console.log(response)
@@ -270,7 +270,7 @@ window.onload = function(){
         }
     })
     $.ajax({
-        url: 'components/com_envioprotocolosbioseguridad/public/assets/js/sectores.json', 
+        url: '/components/com_envioprotocolosbioseguridad/public/assets/js/sectores.json', 
         method: "GET",
         success: function(response){
             //console.log(response)
