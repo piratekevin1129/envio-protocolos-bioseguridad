@@ -80,21 +80,36 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 							$newname = getNameAlias($info['filename']);
 							
 							$folder = $tipo_documento_txt.$numero_documento_txt;
-							if(!file_exists($files_path."/".$folder)){
-								mkdir($files_path."/".$folder);
-								chmod($files_path."/".$folder,777);
-							}
-
 							$path = $files_path."/".$folder."/".$newname.".".$ext;
 
-							if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
+							if(!file_exists($files_path."/".$folder)){
+								if(mkdir($files_path."/".$folder)){
+									if(chmod($files_path."/".$folder,775)){
+										if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
 
-								//enviar correo
-
-								exit('{"success":"success","msg":"'.$newname.".".$ext.'"}');
+											//enviar correo
+			
+											exit('{"success":"success","msg":"'.$newname.".".$ext.'"}');
+										}else{
+											exit('{"success":"error","msg":"Error guardando el archivo"}');
+										}
+									}else{
+										exit('{"success":"error","msg":"Error modificando la carpeta"}');
+									}
+								}else{
+									exit('{"success":"error","msg":"Error creando la carpeta"}');
+								}
 							}else{
-								exit('{"success":"error","msg":"Error guardando el archivo"}');
+								if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
+
+									//enviar correo
+	
+									exit('{"success":"success","msg":"'.$newname.".".$ext.'"}');
+								}else{
+									exit('{"success":"error","msg":"Error guardando el archivo en una carpeta ya creada"}');
+								}
 							}
+							
         				}else{
         					exit('{"success":"error","msg":"El archivo sobrepasar el límite de peso permitido (2M)"}');
         				}
