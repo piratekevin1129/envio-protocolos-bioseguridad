@@ -19,7 +19,7 @@ jimport('joomla.application.component.view');
 			$db = JFactory::getDBO();
 			$query_info = $db->getQuery(true);
 
-			$query_info->select($db->quoteName(array('id','tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono')));
+			$query_info->select($db->quoteName(array('id','tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono','fecha_registro')));
 			$query_info->from($db->quoteName('#__envioprotocolosbioseguridad'));
 			//$query_info->where($db->quoteName('nit_empresa').' = '.$db->quote($nit));
 			$db->setQuery($query_info);		
