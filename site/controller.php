@@ -84,7 +84,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 
 							if(!file_exists($files_path."/".$folder)){
 								if(mkdir($files_path."/".$folder)){
-									if(chmod($files_path."/".$folder,775)){
+									if(chmod($files_path."/".$folder,0775)){
 										if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
 
 											//enviar correo
@@ -151,6 +151,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		$newname = checkComillas(JRequest::getVar('nombre_txt','','post'));
 
 		$from = 'jsanchezy@sura.com.co';
+		//$to = 'jsanchezy@sura.com.co';
 		$to = 'desarrollo3@virtualcolors.com';
 		$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
 		$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
@@ -184,7 +185,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 			text-align:left;
 		}
 		</style>
-		<h1>Envío de Protocolos generales de Bioseguridad a la ARLSURA</h1>
+		<h3>Envío de Protocolos generales de Bioseguridad a la ARLSURA</h3>
 		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus</p>
 		<br />
 		<p><b>Nombre Legal: </b>'.$nombre_legal_txt.'</p>
