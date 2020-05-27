@@ -1,0 +1,27 @@
+#contenedor_principal{
+	position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+#contenedor_principal input::-webkit-outer-spin-button,
+#contenedor_principal input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+#contenedor_principal input[type=number] {
+  -moz-appearance:textfield;
+}
+
+#contenedor_principal input:focus,
+#contenedor_principal select:focus,
+#contenedor_principal textarea:focus,
+#contenedor_principal button:focus {
+    outline: none;
+    outline-width: 0;
+}

@@ -1,0 +1,91 @@
+@font-face {
+    font-family: "FSJoey-Bold";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/FSJoey-Bold.woff2") format('woff2'),
+    	 url("fonts/FSJoey-Bold.woff") format('woff'),
+    	 url("fonts/FSJoey-Bold.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "FSJoey-Heavy";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/FSJoey-Heavy.woff2") format('woff2'),
+    	 url("fonts/FSJoey-Heavy.woff") format('woff'),
+    	 url("fonts/FSJoey-Heavy.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "FSJoey-Medium";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/FSJoey-Medium.woff2") format('woff2'),
+    	 url("fonts/FSJoey-Medium.woff") format('woff'),
+    	 url("fonts/FSJoey-Medium.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "FSJoey-Regular";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/FSJoey-Regular.woff2") format('woff2'),
+    	 url("fonts/FSJoey-Regular.woff") format('woff'),
+    	 url("fonts/FSJoey-Regular.ttf") format('ttf');
+}
+
+/**********BARLOW**********/
+
+@font-face {
+    font-family: "Barlow-Black";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/Barlow-Black.woff2") format('woff2'),
+    	 url("fonts/Barlow-Black.woff") format('woff'),
+    	 url("fonts/Barlow-Black.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "Barlow-Bold";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/Barlow-Bold.woff2") format('woff2'),
+    	 url("fonts/Barlow-Bold.woff") format('woff'),
+    	 url("fonts/Barlow-Bold.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "Barlow-Light";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/Barlow-Light.woff2") format('woff2'),
+    	 url("fonts/Barlow-Light.woff") format('woff'),
+    	 url("fonts/Barlow-Light.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "Barlow-Medium";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/Barlow-Medium.woff2") format('woff2'),
+    	 url("fonts/Barlow-Medium.woff") format('woff'),
+    	 url("fonts/Barlow-Medium.ttf") format('ttf');
+}
+
+@font-face {
+    font-family: "Barlow-Regular";
+    font-display: swap;
+    font-style: normal;
+    font-weight: normal;
+    src: url("fonts/Barlow-Regular.woff2") format('woff2'),
+    	 url("fonts/Barlow-Regular.woff") format('woff'),
+    	 url("fonts/Barlow-Regular.ttf") format('ttf');
+}

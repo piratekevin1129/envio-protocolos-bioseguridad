@@ -1,0 +1,15 @@
+#tabla{
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+    /*border: #000 solid 1px;*/
+}
+#tabla table{
+    position: relative;
+    table-layout: fixed;
+}
+#tabla table td{
+    word-wrap: break-word;
+}
