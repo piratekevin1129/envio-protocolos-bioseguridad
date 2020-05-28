@@ -64,8 +64,15 @@ function changeArchivo(file){
     var padre = file.parentNode
     var p = padre.getElementsByTagName('p')[0]
     p.innerHTML = texto
+    validarForm2(document.getElementById('archivo_cont'))
 }
-
+function recaptchaExpired(){
+    clickRegresar(null)
+    validarForm()
+}
+function recaptchaCallback(){
+    validarForm()
+}
 
 function validarForm(campo){
     validateForm(false)
@@ -165,12 +172,20 @@ function validateForm(save,id){
         correct.push({field:'politicas_txt'})
     }
 
-    /*var file_txt = $('#archivo_txt').val()
+    var file_txt = $('#archivo_txt').val()
     if(empty(file_txt)){
         errors.push({field:'archivo_cont',text:"Suba un archivo"})
     }else{
         correct.push({field:'archivo_cont'})
-    }*/
+    }
+
+    var captcha_verified = grecaptcha.getResponse().length
+    console.log("captcha_verified: "+captcha_verified)
+    if(captcha_verified===0){
+        errors.push({field:'',text:"",active:false})
+    }else{
+        correct.push({field:''})
+    }
 
     //console.log(errors.length)
 
@@ -262,6 +277,7 @@ function clickRegresar(btn){
     $("html, body").animate({ scrollTop: $('#actualizacion-datos-formulario').offset().top }, 500);
 }
 
+
 function clickConfirmar(btn){
     $('#regresar-btn').disabled = true
     $('#correctos-btn').disabled = true
@@ -277,110 +293,80 @@ function clickConfirmar(btn){
     var direccion_txt = $('#direccion_txt').val()
     var correo_electronico_txt = $('#correo_electronico_txt').val()
     var numero_telefonico_txt = $('#numero_telefonico_txt').val()
+    
+    console.log(grecaptcha.getResponse())
 
-    $.ajax({
-        type: 'post',
-        url: 'index.php?option=com_envioprotocolosbioseguridad&task=guardarDatos',
-        data:{
-            nombre_legal_txt:nombre_legal_txt,
-            nombre_comercial_txt:nombre_comercial_txt,
-            tipo_documento_txt:tipo_documento_txt,
-            numero_documento_txt:numero_documento_txt,
-            sector_txt:sector_txt,
-            departamento_residencia_txt:departamento_residencia_txt,
-            ciudad_residencia_txt:ciudad_residencia_txt,
-            direccion_txt:direccion_txt,
-            correo_electronico_txt:correo_electronico_txt,
-            numero_telefonico_txt:numero_telefonico_txt
-        },
-        success: function(result){
-            if(result=='success'){
-                //subir archivo
-                var file_td = $('#file_td').val(tipo_documento_txt)
-                var file_nd = $('#file_nd').val(numero_documento_txt)
-                
-                $("#archivo_form").ajaxForm({
-                    success: function(result) {
-                        var result_json = JSON.parse(result)
-                        if(result_json.success=='success'){
-                            var nombre_txt = result_json.msg;
+    //subir archivo
+    var file_td = $('#file_td').val(tipo_documento_txt)
+    var file_nd = $('#file_nd').val(numero_documento_txt)
+    
+    $("#archivo_form").ajaxForm({
+        success: function(result) {
+            var result_json = JSON.parse(result)
+            if(result_json.success=='success'){
+                var nombre_txt = result_json.msg;
 
-                            //////ENVIAR CORREO////////
-                            $.ajax({
-                                type: 'post',
-                                url: 'index.php?option=com_envioprotocolosbioseguridad&task=sendMail',
-                                data:{
-                                    nombre_legal_txt:nombre_legal_txt,
-                                    nombre_comercial_txt:nombre_comercial_txt,
-                                    tipo_documento_txt:tipo_documento_txt,
-                                    numero_documento_txt:numero_documento_txt,
-                                    sector_txt:sector_txt,
-                                    departamento_residencia_txt:departamento_residencia_txt,
-                                    ciudad_residencia_txt:ciudad_residencia_txt,
-                                    direccion_txt:direccion_txt,
-                                    correo_electronico_txt:correo_electronico_txt,
-                                    numero_telefonico_txt:numero_telefonico_txt,
-                                    nombre_txt:nombre_txt
-                                },
-                                success: function(result){
-                                    if(result=='success'){
-                                        openModal({
-                                            content:'<h3 class="modal-body-title">¡Muchas gracias!</h3><br /><p class="modal-body-text">confirmamos que hemos recibido tu formulario, te estaremos contactando una vez realicemos su revisión.</p>',
-                                            modalclass:'modal-estrellas',
-                                            action:'gotoARL()',
-                                            value:'Salir',
-                                            btnclass:'modal-btn-salir'
-                                        })
-                                    }else{
-                                        openModal({
-                                            content:'<h3 class="modal-body-title">;(<br />Algo salió mal enviando el correo</h3><br /><p class="modal-body-text">Por favor vuelve e inténtalo de nuevo.</p>',
-                                            modalclass:'',
-                                            action:'closeModal()',
-                                            value:'Volver',
-                                            btnclass:'modal-btn-volver'
-                                        })
-                                        console.log(result)
-                                    }
-                                                
-                                    $('#regresar-btn').disabled = true
-                                    $('#correctos-btn').disabled = true
-                                    $('#correctos-btn').html('Están correctos')
-                                },
-                                error: function(xhr){
-                                    console.log(xhr)
-                                    $('#regresar-btn').disabled = true
-                                    $('#correctos-btn').disabled = true
-                                    $('#correctos-btn').html('Están correctos')
-                                    openModal({
-                                        content:'<h3 class="modal-body-title">;(<br />Algo salió mal</h3><br /><p class="modal-body-text">Por favor vuelve e inténtalo de nuevo.</p>',
-                                        modalclass:'',
-                                        action:'closeModal()',
-                                        value:'Volver',
-                                        btnclass:'modal-btn-volver'
-                                    })
-                                }
+                //////GUARDAR Y ENVIAR////////
+                $.ajax({
+                    type: 'post',
+                    url: 'index.php?option=com_envioprotocolosbioseguridad&task=guardarDatos',
+                    data:{
+                        g_recaptcha_response:grecaptcha.getResponse(),
+                        nombre_legal_txt:nombre_legal_txt,
+                        nombre_comercial_txt:nombre_comercial_txt,
+                        tipo_documento_txt:tipo_documento_txt,
+                        numero_documento_txt:numero_documento_txt,
+                        sector_txt:sector_txt,
+                        departamento_residencia_txt:departamento_residencia_txt,
+                        ciudad_residencia_txt:ciudad_residencia_txt,
+                        direccion_txt:direccion_txt,
+                        correo_electronico_txt:correo_electronico_txt,
+                        numero_telefonico_txt:numero_telefonico_txt,
+                        nombre_txt:nombre_txt
+                    },
+                    success: function(result){
+                        if(result=='success'){
+                            openModal({
+                                content:'<h3 class="modal-body-title">¡Muchas gracias!</h3><br /><p class="modal-body-text">confirmamos que hemos recibido tu formulario, te estaremos contactando una vez realicemos su revisión.</p>',
+                                modalclass:'modal-estrellas',
+                                action:'gotoARL()',
+                                value:'Salir',
+                                btnclass:'modal-btn-salir'
                             })
                         }else{
+                            openModal({
+                                content:'<h3 class="modal-body-title">;(<br />¡Algo salió mal!</h3><br /><p class="modal-body-text">Por favor vuelve e inténtalo de nuevo.</p>',
+                                modalclass:'',
+                                action:'closeModal()',
+                                value:'Volver',
+                                btnclass:'modal-btn-volver'
+                            })
                             console.log(result)
                         }
+                                    
+                        $('#regresar-btn').disabled = true
+                        $('#correctos-btn').disabled = true
+                        $('#correctos-btn').html('Están correctos')
+                    },
+                    error: function(xhr){
+                        console.log(xhr)
+                        $('#regresar-btn').disabled = true
+                        $('#correctos-btn').disabled = true
+                        $('#correctos-btn').html('Están correctos')
+                        openModal({
+                            content:'<h3 class="modal-body-title">;(<br />Algo salió mal</h3><br /><p class="modal-body-text">Por favor vuelve e inténtalo de nuevo.</p>',
+                            modalclass:'',
+                            action:'closeModal()',
+                            value:'Volver',
+                            btnclass:'modal-btn-volver'
+                        })
                     }
-                });
-                $("#archivo_form").submit()
-            }else{
-                openModal({
-                    content:'<h3 class="modal-body-title">;(<br />Algo salió mal</h3><br /><p class="modal-body-text">Por favor vuelve e inténtalo de nuevo.</p>',
-                    modalclass:'',
-                    action:'closeModal()',
-                    value:'Volver',
-                    btnclass:'modal-btn-volver'
                 })
-                $('#regresar-btn').disabled = true
-                $('#correctos-btn').disabled = true
-                $('#correctos-btn').html('Están correctos')
+            }else{
+                console.log(result)
             }
         },
-        error: function(xhr){
-            console.log(xhr)
+        error: function(request){
             $('#regresar-btn').disabled = true
             $('#correctos-btn').disabled = true
             $('#correctos-btn').html('Están correctos')
@@ -391,9 +377,12 @@ function clickConfirmar(btn){
                 value:'Volver',
                 btnclass:'modal-btn-volver'
             })
+            console.log("error ajaxForm")
+            console.log(request.responseText)
         }
-    })
-
+    });
+    $("#archivo_form").submit()
+    
 }
 
 function clickTerminosCondiciones(){

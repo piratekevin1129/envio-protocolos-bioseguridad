@@ -1,3 +1,6 @@
+<?php 
+header('Access-Control-Allow-Origin: *');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +28,9 @@
     <link href="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/css/reset.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/css/master.css" rel="stylesheet" type="text/css" />
     <link href="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/css/responsive.css" rel="stylesheet" type="text/css" />
+
     <title>Envío Protocolos Bioseguridad</title>
+
 </head>
 <body>
 
@@ -152,6 +157,9 @@
         </div>
 
         <br />
+        <div class="g-recaptcha" data-sitekey="6Lf7QAETAAAAAHR-6hqEwDoZ8OPO_vbzJi1r2lOb" data-callback="recaptchaCallback" data-expired-callback="recaptchaExpired" id="capcha"></div>
+
+        <br />
         <button onclick="clickGuardar(this)" id="guardar-btn" class="btn-locked">Continuar</button>
         <br />
         <br />
@@ -248,7 +256,7 @@
 
 <script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/validation.js"></script>
 <script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/master.js"></script>
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
 
 var ciudades_data = null
@@ -282,7 +290,6 @@ window.onload = function(){
             console.log(xhr)
         }
     })
-
 }
 
 </script>

@@ -11,6 +11,14 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 	    
 	function guardarDatos(){
 		$app = JFactory::getApplication();
+		$base = str_replace('\\','/',JPATH_BASE)."/";
+  		$sectores_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/sectores.json";
+		$sectores_file = file_get_contents($sectores_url);
+		$sectores_data = json_decode($sectores_file,true);
+
+		$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
+		$ciudades_file = file_get_contents($ciudades_url);
+		$ciudades_data = json_decode($ciudades_file,true);
 				
         $nombre_legal_txt = checkComillas(JRequest::getVar('nombre_legal_txt','','post'));
         $nombre_comercial_txt = checkComillas(JRequest::getVar('nombre_comercial_txt','','post'));
@@ -23,31 +31,123 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
         $direccion_txt = checkComillas(JRequest::getVar('direccion_txt','','post'));
         $correo_electronico_txt = checkComillas(JRequest::getVar('correo_electronico_txt','','post'));
 		$numero_telefonico_txt = checkComillas(JRequest::getVar('numero_telefonico_txt','','post'));
+		$newname = checkComillas(JRequest::getVar('nombre_txt','','post'));
+
+		$secretkey = '6Lf7QAETAAAAAH1jj-pXZPuOAjFmcKfTuvCg7oI5';
+		$recaptcha = JRequest::getVar('g_recaptcha_response','','post');
 		
-        $db = JFactory::getDBO();
-        $query_inserta = $db->getQuery(true);
-        
-        $columns = array('tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono');
-        $values = array(
-                        $db->quote($tipo_documento_txt),
-                        $db->quote($numero_documento_txt),
-                        $db->quote($nombre_comercial_txt),
-                        $db->quote($nombre_legal_txt),
-                        $db->quote($sector_txt),
-                        $db->quote($departamento_residencia_txt),
-                        $db->quote($ciudad_residencia_txt),
-                        $db->quote($direccion_txt),
-						$db->quote($correo_electronico_txt),
-						$db->quote($numero_telefonico_txt)
-                        );
-        $query_inserta->insert($db->quoteName('#__envioprotocolosbioseguridad'))
-                        ->columns($db->quoteName($columns))
-                        ->values(implode(',',$values));
-        $db->setQuery($query_inserta);
-        $db->execute();
-        
-		//$last_id = $db->insertid();
-        exit("success");
+		if(!empty($recaptcha)){	
+			$google_url="https://www.google.com/recaptcha/api/siteverify";
+			$secret='6Lf7QAETAAAAAH1jj-pXZPuOAjFmcKfTuvCg7oI5';
+			$ip=$_SERVER['REMOTE_ADDR'];
+			$url=$google_url."?secret=".$secret."&response=".$recaptcha."&remoteip=".$ip;
+			
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_URL, $url);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+			curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.16) Gecko/20110319 Firefox/3.6.16");
+			$curlData = curl_exec($curl);
+			curl_close($curl);
+			
+			$res= json_decode($curlData, true);
+			
+			if($res['success']){
+				$db = JFactory::getDBO();
+		        $query_inserta = $db->getQuery(true);
+		        
+		        $columns = array('tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono','archivo');
+		        $values = array(
+		                        $db->quote($tipo_documento_txt),
+		                        $db->quote($numero_documento_txt),
+		                        $db->quote($nombre_comercial_txt),
+		                        $db->quote($nombre_legal_txt),
+		                        $db->quote($sector_txt),
+		                        $db->quote($departamento_residencia_txt),
+		                        $db->quote($ciudad_residencia_txt),
+		                        $db->quote($direccion_txt),
+								$db->quote($correo_electronico_txt),
+								$db->quote($numero_telefonico_txt),
+								$db->quote($newname)
+		                        );
+		        $query_inserta->insert($db->quoteName('#__envioprotocolosbioseguridad'))
+		                        ->columns($db->quoteName($columns))
+		                        ->values(implode(',',$values));
+		        $db->setQuery($query_inserta);
+		        $db->execute();
+				//$last_id = $db->insertid();
+
+		        /////////////ENVIAR CORREO//////////////
+				$from = 'jsanchezy@sura.com.co';
+				$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
+				//$to = 'desarrollo3@virtualcolors.com';
+				$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
+				$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
+
+				$files_path = $base."components/com_envioprotocolosbioseguridad/public/storage";
+				$folder = $tipo_documento_txt.$numero_documento_txt;
+				
+				$path = $files_path."/".$folder."/".$newname;
+
+				# Invocar JMail Class
+				$mailer = JFactory::getMailer();
+
+				# Seteamos quien envia el correo junto el nombre
+				$mailer->setSender($from);
+
+				# Añadimos el que recibe el correo
+				$mailer->addRecipient($to);
+
+				# Mandamos como HTML
+				$mailer->isHTML(true);
+
+				$mailer->Encoding = 'base64';
+
+				$body = '';
+				$body.='
+				<style type="text/css">
+				h1,p{
+					font-family: Arial;
+					font-size: 16px;
+					color: #111111;
+					text-align:left;
+				}
+				</style>
+				<h3>Envío de Protocolos generales de Bioseguridad a la ARLSURA</h3>
+				<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus</p>
+				<br />
+				<p><b>Nombre Legal: </b>'.$nombre_legal_txt.'</p>
+				<p><b>Nombre Comercial: </b>'.$nombre_comercial_txt.'</p>
+				<p><b>NIT: </b>'.$tipo_documento_txt.".".$numero_documento_txt.'</p>
+				<p><b>Sector: </b>'.$sectores_data[$sector_txt].'</p>
+				<p><b>Departamento: </b>'.$departamento_name.'</p>
+				<p><b>Municipio: </b>'.$ciudad_name.'</p>
+				<p><b>Dirección: </b>'.$direccion_txt.'</p>
+				<p><b>E-mail: </b>'.$correo_electronico_txt.'</p>
+				<p><b>Número telefónico: </b>'.$numero_telefonico_txt.'</p>';
+
+				//$subject = "Solicitudes EPS - ".ucwords($_POST['numero_identificacion']);
+				//NUEVO SUBJECT
+				$subject = "Envio protocolos bioseguridad ".$tipo_documento_txt.$numero_documento_txt;
+				$mailer->setSubject($subject);
+				$mailer->setBody($body);
+
+				# Añadimos el documento como archivo adjunto
+				$mailer->addAttachment($path);
+
+				#Eviamos el correo
+				$mailer->Send();
+
+				///eliminar correo adjunto////
+				unlink($path);
+				rmdir($files_path."/".$folder);
+		        exit("success");
+			}else{
+				exit("captcha incorrecto");
+			}
+		}else{
+			exit("captcha inválido");
+		}
   	}
 
   	function saveFile(){
@@ -125,91 +225,6 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
         }else{
         	exit('{"success":"error","msg":"No se adjuntó ningún archivo"}');
         }
-  	}
-
-  	function sendMail(){
-  		$base = str_replace('\\','/',JPATH_BASE)."/";
-  		$sectores_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/sectores.json";
-		$sectores_file = file_get_contents($sectores_url);
-		$sectores_data = json_decode($sectores_file,true);
-
-		$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
-		$ciudades_file = file_get_contents($ciudades_url);
-		$ciudades_data = json_decode($ciudades_file,true);
-
-		$nombre_legal_txt = checkComillas(JRequest::getVar('nombre_legal_txt','','post'));
-        $nombre_comercial_txt = checkComillas(JRequest::getVar('nombre_comercial_txt','','post'));
-        $numero_documento_txt = checkComillas(JRequest::getVar('numero_documento_txt','','post'));
-        $tipo_documento_txt = checkComillas(JRequest::getVar('tipo_documento_txt','','post'));
-        
-		$sector_txt = checkComillas(JRequest::getVar('sector_txt','','post'));
-		$departamento_residencia_txt = checkComillas(JRequest::getVar('departamento_residencia_txt','','post'));
-        $ciudad_residencia_txt = checkComillas(JRequest::getVar('ciudad_residencia_txt','','post'));
-        $direccion_txt = checkComillas(JRequest::getVar('direccion_txt','','post'));
-        $correo_electronico_txt = checkComillas(JRequest::getVar('correo_electronico_txt','','post'));
-		$numero_telefonico_txt = checkComillas(JRequest::getVar('numero_telefonico_txt','','post'));
-		$newname = checkComillas(JRequest::getVar('nombre_txt','','post'));
-
-		$from = 'jsanchezy@sura.com.co';
-		$to = 'jsanchezy@sura.com.co';
-		//$to = 'desarrollo3@virtualcolors.com';
-		$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
-		$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
-
-		$files_path = $base."components/com_envioprotocolosbioseguridad/public/storage";
-		$folder = $tipo_documento_txt.$numero_documento_txt;
-		
-		$path = $files_path."/".$folder."/".$newname;
-
-		# Invocar JMail Class
-		$mailer = JFactory::getMailer();
-
-		# Seteamos quien envia el correo junto el nombre
-		$mailer->setSender($from);
-
-		# Añadimos el que recibe el correo
-		$mailer->addRecipient($to);
-
-		# Mandamos como HTML
-		$mailer->isHTML(true);
-
-		$mailer->Encoding = 'base64';
-
-		$body = '';
-		$body.='
-		<style type="text/css">
-		h1,p{
-			font-family: Arial;
-			font-size: 16px;
-			color: #111111;
-			text-align:left;
-		}
-		</style>
-		<h3>Envío de Protocolos generales de Bioseguridad a la ARLSURA</h3>
-		<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus</p>
-		<br />
-		<p><b>Nombre Legal: </b>'.$nombre_legal_txt.'</p>
-		<p><b>Nombre Comercial: </b>'.$nombre_comercial_txt.'</p>
-		<p><b>NIT: </b>'.$tipo_documento_txt.".".$numero_documento_txt.'</p>
-		<p><b>Sector: </b>'.$sectores_data[$sector_txt].'</p>
-		<p><b>Departamento: </b>'.$departamento_name.'</p>
-		<p><b>Municipio: </b>'.$ciudad_name.'</p>
-		<p><b>Dirección: </b>'.$direccion_txt.'</p>
-		<p><b>E-mail: </b>'.$correo_electronico_txt.'</p>
-		<p><b>Número telefónico: </b>'.$numero_telefonico_txt.'</p>';
-
-		//$subject = "Solicitudes EPS - ".ucwords($_POST['numero_identificacion']);
-		//NUEVO SUBJECT
-		$subject = "Envio protocolos bioseguridad ".$tipo_documento_txt.$numero_documento_txt;
-		$mailer->setSubject($subject);
-		$mailer->setBody($body);
-
-		# Añadimos el documento como archivo adjunto
-		$mailer->addAttachment($path);
-
-		#Eviamos el correo
-		$mailer->Send();
-		exit("success");
   	}
   
   	function generarReporte(){
