@@ -78,9 +78,9 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 				//$last_id = $db->insertid();
 
 		        /////////////ENVIAR CORREO//////////////
-				$from = 'jsanchezy@sura.com.co';
-				$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
-				//$to = 'desarrollo3@virtualcolors.com';
+				$from = 'seguridadsocial@sura.com.co';
+				//$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
+				$to = 'jsanchezy@sura.com.co';
 				$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
 				$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
 
@@ -211,7 +211,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 							}
 							
         				}else{
-        					exit('{"success":"error","msg":"El archivo sobrepasar el límite de peso permitido (2M)"}');
+        					exit('{"success":"error","msg":"El archivo sobrepasa el límite de peso permitido (2M)"}');
         				}
         			}else{
         				exit('{"success":"error","msg":"El formato del archivo no es válido"}');

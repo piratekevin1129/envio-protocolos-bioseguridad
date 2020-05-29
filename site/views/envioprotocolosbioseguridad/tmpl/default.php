@@ -154,6 +154,7 @@ header('Access-Control-Allow-Origin: *');
                     <input type="file" name="archivo_txt" id="archivo_txt" accept=".pdf,.jpg,.jpeg,.png,.docx,.docx,.xls,.xlsx,.ppt,.pptx,.zip" onchange="changeArchivo(this)" onchange="validarForm2(this)" />
                 </form>
             </div>
+            <p class="form-help">Los tipos de archivo permitido son: <span>JPG</span>, <span>PNG</span>, <span>Docs WORD</span>, <span>Docs EXCEL</span>, <span>Docs PowerPoint</span>, <span>PDF</span>, <span>ZIP</span>. Y deben tener un tamaño menor a 2MB</p>
         </div>
 
         <br />

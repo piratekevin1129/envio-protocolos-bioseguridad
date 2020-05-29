@@ -315,8 +315,11 @@
     line-height: normal;
     margin: 0px;
     padding: 0px;
-    margin-bottom: 8px;
+    margin-top: 8px;
     font-style: italic;
+}
+#contenedor_principal .form-help span{
+    font-family: 'Barlow-Bold';
 }
 #contenedor_principal .form-error{
     position: absolute;
@@ -363,7 +366,8 @@
     -webkit-transition: box-shadow 0.1s, border 0.1s;
 }
 #contenedor_principal .form-input-email,
-#contenedor_principal #correo_electronico_value{
+#contenedor_principal #correo_electronico_value,
+#contenedor_principal #archivo_value{
     text-transform: none !important;
 }
 #contenedor_principal .form-input:hover,

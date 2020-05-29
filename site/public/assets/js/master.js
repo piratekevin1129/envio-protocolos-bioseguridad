@@ -32,11 +32,10 @@ function fillDepartamentos(){
 }
 
 function fillSectores(){
-    var html = '<option value="0">Seleccionar</option>'
-    var opti1 = document.createElement('option')
-    opti1.innerHTML = 'Seleccionar'
+    var html = ''
+    
     for(i = 0;i<sectores_data.length;i++){
-        html+='<option value="'+(i+1)+'">'+sectores_data[i]+'</option>'
+        html+='<option value="'+i+'">'+sectores_data[i]+'</option>'
         
     }
     $('#sector_txt').html(html)
@@ -176,7 +175,19 @@ function validateForm(save,id){
     if(empty(file_txt)){
         errors.push({field:'archivo_cont',text:"Suba un archivo"})
     }else{
-        correct.push({field:'archivo_cont'})
+        var file = document.getElementById('archivo_txt')
+        if(file.files.length > 0){
+            var size = file.files[0].size; 
+            var size_m = Math.round((size / 1024)); 
+            // The size of the file. 
+            if(size_m>=2000){
+                errors.push({field:'archivo_cont',text:"El archivo sobre pasa el límite de peso 2MG"})
+            }else{ 
+                correct.push({field:'archivo_cont'})
+            }
+        }else{
+            errors.push({field:'archivo_cont',text:"No hay archivos adjuntos"})
+        }
     }
 
     var captcha_verified = grecaptcha.getResponse().length
@@ -243,28 +254,31 @@ function clickGuardar(btn){
     var ciudad_residencia_txt = $('#ciudad_residencia_txt').val()
     var direccion_txt = $('#direccion_txt').val()
     var archivo_txt = $('#archivo_txt').val()
+    var archivo_name_txt = archivo_txt.substr(archivo_txt.lastIndexOf('\\') + 1).split('.')[0];
+    var archivo_ext_txt = archivo_txt.substr(archivo_txt.lastIndexOf('\\') + 1).split('.')[1];
     
     var politicas_txt = $('#politicas_txt').prop('checked')
 
     var sector_txt = $('#sector_txt').val()
     
-    $('#nombre_legal_value').html(nombre_legal_txt)
-    $('#nombre_comercial_value').html(nombre_comercial_txt)
-    $('#documento_value').html(tipo_documento_txt+'. '+numero_documento_txt)
+    $('#nombre_legal_value').html(clearVal(nombre_legal_txt))
+    $('#nombre_comercial_value').html(clearVal(nombre_comercial_txt))
+    $('#documento_value').html(clearVal(tipo_documento_txt)+'. '+clearVal(numero_documento_txt))
 
-    $('#numero_telefonico_value').html(numero_telefonico_txt)
-    $('#correo_electronico_value').html(correo_electronico_txt)
+    $('#numero_telefonico_value').html(clearVal(numero_telefonico_txt))
+    $('#correo_electronico_value').html(clearVal(correo_electronico_txt))
 
-    $('#sector_value').html(sectores_data[sector_txt])
+    $('#sector_value').html(clearVal(sectores_data[sector_txt]))
                     
     $('#departamento_residencia_value').html(ciudades_data[parseInt(departamento_residencia_txt-1)].departamento)
     $('#ciudad_residencia_value').html(ciudades_data[parseInt(departamento_residencia_txt-1)].municipios[ciudad_residencia_txt-1].municipio)
-    $('#direccion_value').html(direccion_txt)
+    $('#direccion_value').html(clearVal(direccion_txt))
     
     if(politicas_txt){
         $('#politicas_value').addClass('form-checkbox-square-checked')
     }
-    $('#archivo_value').html(archivo_txt)
+
+    $('#archivo_value').html(archivo_name_txt+'.'+archivo_ext_txt)
 
     $('#actualizacion-datos-formulario').attr('style','display:none')
     $('#actualizacion-datos-formulario2').attr('style','display:block')
@@ -312,17 +326,17 @@ function clickConfirmar(btn){
                     url: 'index.php?option=com_envioprotocolosbioseguridad&task=guardarDatos',
                     data:{
                         g_recaptcha_response:grecaptcha.getResponse(),
-                        nombre_legal_txt:nombre_legal_txt,
-                        nombre_comercial_txt:nombre_comercial_txt,
-                        tipo_documento_txt:tipo_documento_txt,
-                        numero_documento_txt:numero_documento_txt,
-                        sector_txt:sector_txt,
-                        departamento_residencia_txt:departamento_residencia_txt,
-                        ciudad_residencia_txt:ciudad_residencia_txt,
-                        direccion_txt:direccion_txt,
-                        correo_electronico_txt:correo_electronico_txt,
-                        numero_telefonico_txt:numero_telefonico_txt,
-                        nombre_txt:nombre_txt
+                        nombre_legal_txt:clearVal(nombre_legal_txt),
+                        nombre_comercial_txt:clearVal(nombre_comercial_txt),
+                        tipo_documento_txt:clearVal(tipo_documento_txt),
+                        numero_documento_txt:clearVal(numero_documento_txt),
+                        sector_txt:clearVal(sector_txt),
+                        departamento_residencia_txt:clearVal(departamento_residencia_txt),
+                        ciudad_residencia_txt:clearVal(ciudad_residencia_txt),
+                        direccion_txt:clearVal(direccion_txt),
+                        correo_electronico_txt:clearVal(correo_electronico_txt),
+                        numero_telefonico_txt:clearVal(numero_telefonico_txt),
+                        nombre_txt:clearVal(nombre_txt)
                     },
                     success: function(result){
                         if(result=='success'){
@@ -343,7 +357,6 @@ function clickConfirmar(btn){
                             })
                             console.log(result)
                         }
-                                    
                         $('#regresar-btn').disabled = true
                         $('#correctos-btn').disabled = true
                         $('#correctos-btn').html('Están correctos')
@@ -363,6 +376,16 @@ function clickConfirmar(btn){
                     }
                 })
             }else{
+                $('#regresar-btn').disabled = true
+                $('#correctos-btn').disabled = true
+                $('#correctos-btn').html('Están correctos')
+                openModal({
+                    content:'<h3 class="modal-body-title">;(<br />Algo salió mal</h3><br /><p class="modal-body-text">'+result_json.msg+'.</p>',
+                    modalclass:'',
+                    action:'closeModal()',
+                    value:'Volver',
+                    btnclass:'modal-btn-volver'
+                })
                 console.log(result)
             }
         },

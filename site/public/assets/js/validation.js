@@ -1,5 +1,5 @@
 function validateNumber(cadena){
-	var cadena_str = String(cadena)
+	var cadena_str = clearVal(String(cadena))
 	var cadena_arr = cadena_str.split("")
 
 	var correctos = 0
@@ -27,7 +27,8 @@ function validateNumber(cadena){
 	}
 }
 
-function validateEmail(cadena){
+function validateEmail(cadena_){
+	var cadena = clearVal(String(cadena_))
 	if(cadena.indexOf('@')!=-1&&cadena.indexOf('.')!=-1){
 		return true
 	}else{
@@ -35,7 +36,19 @@ function validateEmail(cadena){
 	}
 }
 
-function empty(input){
+function clearVal(str){
+	var new_str = str.replace(new RegExp('<','g'), '')
+	var new_str1 = new_str.replace(new RegExp('>','g'), '')
+	var new_str2 = new_str1.replace(new RegExp('"','g'), '')
+	var new_str3 = new_str2.replace(new RegExp("'",'g'), '')
+	var new_str4 = new_str3.replace(new RegExp('\\\\','g'), '')
+	var new_str4 = new_str3.replace(new RegExp('\\\\','g'), '')
+	var new_str5 = new_str4.replace(new RegExp('=','g'), '')
+	return new_str5
+}
+
+function empty(str){
+	var input = clearVal(str)
 	var text_value = input
 	var text_value_arr = text_value.split("")
 	var espacios = 0
