@@ -80,7 +80,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		        /////////////ENVIAR CORREO//////////////
 				$from = 'seguridadsocial@sura.com.co';
 				//$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
-				$to = 'jsanchezy@sura.com.co';
+				$to = 'botpdnredprot@suramericana.com.co';
 				$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
 				$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
 
@@ -118,7 +118,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 				<br />
 				<p><b>Nombre Legal: </b>'.$nombre_legal_txt.'</p>
 				<p><b>Nombre Comercial: </b>'.$nombre_comercial_txt.'</p>
-				<p><b>NIT: </b>'.$tipo_documento_txt.".".$numero_documento_txt.'</p>
+				<p><b>NIT: </b>'.$tipo_documento_txt.$numero_documento_txt.'</p>
 				<p><b>Sector: </b>'.$sectores_data[$sector_txt].'</p>
 				<p><b>Departamento: </b>'.$departamento_name.'</p>
 				<p><b>Municipio: </b>'.$ciudad_name.'</p>

@@ -65,6 +65,15 @@ function changeArchivo(file){
     p.innerHTML = texto
     validarForm2(document.getElementById('archivo_cont'))
 }
+
+function borrarArchivo(file){
+    $('#archivo_form').trigger("reset");
+    var padre = file.parentNode
+    var p = padre.getElementsByTagName('p')[0]
+    p.innerHTML = 'Seleccionar un archivo'
+    validarForm2(document.getElementById('archivo_cont'))
+}
+
 function recaptchaExpired(){
     clickRegresar(null)
     validarForm()
@@ -181,7 +190,7 @@ function validateForm(save,id){
             var size_m = Math.round((size / 1024)); 
             // The size of the file. 
             if(size_m>=2000){
-                errors.push({field:'archivo_cont',text:"El archivo sobre pasa el límite de peso 2MG"})
+                errors.push({field:'archivo_cont',text:"El archivo sobrepasa el límite de peso 2MG"})
             }else{ 
                 correct.push({field:'archivo_cont'})
             }

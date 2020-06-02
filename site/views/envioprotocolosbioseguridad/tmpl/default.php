@@ -56,97 +56,83 @@ header('Access-Control-Allow-Origin: *');
         
         <div class="form-group">
         <!--<div class="form-subgroup form-subgroup-30 form-subgroup-pr">-->
-            <p class="form-error"></p>
             <p class="form-label">Tipo Doc*</p>
             <select id="tipo_documento_txt" class="form-select" onchange="validarForm2(this)" onblur="validarForm2(this)" autocomplete="off">
                 <option value="0">Seleccionar</option>
                 <option value="C">CEDULA</option>
-                <option value="E">CEDULA DE EXTRANJERIA</option>
-                <option value="TC">CERTIFICADO NACIDO VIVO</option>
-                <option value="D">DIPLOMATICO</option>
-                <option value="X">DOC.IDENT. DE EXTRANJEROS</option>
-                <option value="F">IDENT. FISCAL PARA EXT.</option>
-                <option value="A">NIT</option>
-                <option value="CA">NIT PERSONAS NATURALES</option>
-                <option value="N">NUIP</option>
-                <option value="P">PASAPORTE</option>
-                <option value="TP">PASAPORTE ONU</option>
-                <option value="TF">PERMISO ESPECIAL FORMACN PEPFF</option>
-                <option value="TE">PERMISO ESPECIAL PERMANENCIA </option>
-                <option value="R">REGISTRO CIVIL</option>
-                <option value="TS">SALVOCONDUCTO DE PERMANENCIA</option>
-                <option value="T">TARJ.IDENTIDAD</option>
+                <option value="N">NIT</option>
             </select>
+            <p class="form-error"></p>
         <!--</div>-->
         </div>  
 
         <div class="form-group">
         <!--<div class="form-subgroup form-subgroup-70 form-subgroup-pl">-->
-            <p class="form-error"></p>
             <p class="form-label">Número Doc / NIT *</p>
             <input id="numero_documento_txt" class="form-input" placeholder="Número de cédula o NIT" autocomplete="off" type="text" maxlength="20" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         <!--</div>-->
         </div>
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Nombre comercial de la empresa *</p>
             <input id="nombre_comercial_txt" class="form-input" placeholder="Ingrese Nombre Comercial" autocomplete="off" type="text" maxlength="255" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         </div>
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Nombre Legal de la empresa *</p>
             <input id="nombre_legal_txt" class="form-input" placeholder="Ingrese Nombre Legal" autocomplete="off" type="text" maxlength="255" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         </div> 
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Sector económico</p>
             <select id="sector_txt" class="form-select" onchange="validarForm2(this)" onblur="validarForm2(this)" autocomplete="off">
                 
             </select>
+            <p class="form-error"></p>
         </div>
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Departamento *</p>
             <select id="departamento_residencia_txt" class="form-select" onchange="cambiarDepartamento(this)" autocomplete="off">
             </select>
+            <p class="form-error"></p>
         </div>  
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Municipio *</p>
             <select id="ciudad_residencia_txt" class="form-select" onchange="validarForm2(this)" autocomplete="off">
                 <option value="0">Seleccionar</option>
             </select>
+            <p class="form-error"></p>
         </div>  
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Dirección</p>
             <!--<p class="form-help">tenga presente sus horarios laborales para garantizar que esté en el lugar definido a la hora de recibir los EPP</p>-->
             <input id="direccion_txt" class="form-input" placeholder="Ingrese dirección" autocomplete="off" type="text" maxlength="255" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         </div>
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Correo electrónico *</p>
             <input id="correo_electronico_txt" class="form-input form-input-email" placeholder="Ingrese una dirección de correo válida" autocomplete="off" type="text" maxlength="255" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         </div>
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Número celular *</p>
             <input id="numero_telefonico_txt" class="form-input" placeholder="Ingrese número fijo o celular" autocomplete="off" type="text" maxlength="10" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-error"></p>
         </div> 
 
         <div class="form-group">
-            <p class="form-error"></p>
             <p class="form-label">Adjuntar archivo *</p>
             <div class="form-input-file" id="archivo_cont">
                 <form id="archivo_form" method="post" enctype="multipart/form-data" action="index.php?option=com_envioprotocolosbioseguridad&task=saveFile">
+                    <div onclick="borrarArchivo(this)"><i class="far fa-trash-alt"></i></div>
                     <button>Subir</button>
                     <p>Seleccionar un archivo</p>
                     <input type="hidden" name="td" id="file_td" />
@@ -155,6 +141,7 @@ header('Access-Control-Allow-Origin: *');
                 </form>
             </div>
             <p class="form-help">Los tipos de archivo permitido son: <span>JPG</span>, <span>PNG</span>, <span>Docs WORD</span>, <span>Docs EXCEL</span>, <span>Docs PowerPoint</span>, <span>PDF</span>, <span>ZIP</span>. Y deben tener un tamaño menor a 2MB</p>
+            <p class="form-error"></p>
         </div>
 
         <br />

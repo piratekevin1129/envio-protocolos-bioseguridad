@@ -233,6 +233,8 @@
 #contenedor_principal .form-input-file input{
     position: absolute;
     width: 100%;
+    width: calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
     height: 100%;
     top: 0px;
     left: 0px;
@@ -243,7 +245,7 @@
     position: relative;
     display: block;
     float: left;
-    width: 150px;
+    width: 100px;
     height: 100%;
     margin: 0px;
     padding: 0px;
@@ -264,11 +266,11 @@
     margin: 0px;
     padding: 0px 10px;
     width: 100%;
-    width: calc(100% - 150px);
-    width: -moz-calc(100% - 150px);
+    width: calc(100% - 140px);
+    width: -moz-calc(100% - 140px);
     height: 100%;
 
-    margin-left: 150px;
+    margin-left: 100px;
     font-family: 'Barlow-Regular';
     font-size: 14px;
     color: #444444;
@@ -280,6 +282,28 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+#contenedor_principal .form-input-file div{
+    position: relative;
+    display: block;
+    float: right;
+    width: 40px;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    cursor: pointer;
+    background-color: #B4B7BC;
+    border: none;
+    font-family: 'Barlow-Regular';
+    font-size: 18px;
+    color: #FFFFFF;
+    line-height: 44px;
+    text-align: center;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+#contenedor_principal .form-input-file div:hover{
+    background-color: #909397;
 }
 
 #contenedor_principal .form-texto{

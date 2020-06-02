@@ -143,9 +143,8 @@
     }
     #contenedor_principal .form-error{
         font-size: 14px;
-        top: 100%;
-        top: calc(100% + 2px);
-        top: -moz-calc(100% + 2px);
+        top: initial;
+        position: relative;
     }
     .form-pregunta p{
         font-size: 14px;
@@ -166,14 +165,20 @@
     }
 
     #contenedor_principal .form-input-file button{
-        width: 40%;
+        width: 30%;
         font-size: 16px;
+    }
+    #contenedor_principal .form-input-file div{
+        width: 10%;
+    }
+    #contenedor_principal .form-input-file input{
+        width: 90%;
     }
     #contenedor_principal .form-input-file p{
         padding: 0px 5px;
         width: 60%;
 
-        margin-left: 40%;
+        margin-left: 30%;
         font-size: 14px;
     }
 
