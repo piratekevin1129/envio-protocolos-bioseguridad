@@ -78,7 +78,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 				//$last_id = $db->insertid();
 
 		        /////////////ENVIAR CORREO//////////////
-				$from = 'seguridadsocial@sura.com.co';
+				$from = 'envioprotocolosbioseguridad@suramericana.com.co';
 				//$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
 				$to = 'botpdnredprot@suramericana.com.co';
 				$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
