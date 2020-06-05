@@ -131,7 +131,7 @@ header('Access-Control-Allow-Origin: *');
         <div class="form-group">
             <p class="form-label">Adjuntar archivo *</p>
             <div class="form-input-file" id="archivo_cont">
-                <form id="archivo_form" method="post" enctype="multipart/form-data" action="index.php?option=com_envioprotocolosbioseguridad&task=saveFile">
+                <form id="archivo_form" method="post" enctype="multipart/form-data" action="index.php?option=com_envioprotocolosbioseguridad&task=guardarArchivo">
                     <div onclick="borrarArchivo(this)"><i class="far fa-trash-alt"></i></div>
                     <button>Subir</button>
                     <p>Seleccionar un archivo</p>

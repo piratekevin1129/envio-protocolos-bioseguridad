@@ -8,7 +8,58 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		
 		parent::display();
 	}
-	    
+	
+	function guardarArchivo(){
+		$numero_documento_txt = checkComillas(JRequest::getVar('nd','','post'));
+        $tipo_documento_txt = checkComillas(JRequest::getVar('td','','post'));
+        //$numero_documento_txt = '123456789';
+        //$tipo_documento_txt = 'N';
+
+        $validacion_archivo = validarArchivo($_FILES);
+        if($validacion_archivo['success']){
+			$info = pathinfo($_FILES['archivo_txt']['name']);
+			$ext = $info['extension']; // get the extension of the file
+			$newname = getNameAlias($info['filename']);
+			$prefix = $tipo_documento_txt.$numero_documento_txt.'-';
+			
+			$unique_id = md5(uniqid($prefix.$newname)).'.'.$ext;
+
+			//servicio PUT
+			//API URL
+			$url = 'https://storageprotocolosbioarl.blob.core.windows.net/protocolos/'.$unique_id.'?sv=2019-10-10&ss=b&srt=co&sp=wc&se=2024-01-01T09:29:09Z&st=2020-06-04T01:29:09Z&spr=https,http&sig=Eq0YF9%2FzLUmjRqjlNPUWmcAk8evTQzcJbCIV9Mv2UfY%3D';
+
+			$ch = curl_init($url);
+
+			$tmpfile = $_FILES['archivo_txt']['tmp_name'];
+			$data = array(
+			    'file' => '@'.$tmpfile.';filename='.$unique_id,
+			);
+			
+			$headers = array(
+				'Content-Type: '.$_FILES['archivo_txt']['type'],
+				'x-ms-blob-type: BlockBlob'
+				//'x-ms-blob-content-disposition : attachment; filename="'.$unique_id.'"'
+			);
+
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents($tmpfile));
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			
+			$result = curl_exec($ch);
+			$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+
+			//echo $httpcode.'<br />'.$unique_id;
+			//$_FILES['archivo_txt']['tmp_name']
+			exit('{"success":"success","msg":"'.$unique_id.'","code":"'.$httpcode.'"}');
+			
+        }else{
+        	exit('{"success":"error","msg":"'.$validacion_archivo['msg'].'"}');
+        }
+	}
+
 	function guardarDatos(){
 		$app = JFactory::getApplication();
 		$base = str_replace('\\','/',JPATH_BASE)."/";
@@ -32,6 +83,9 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
         $correo_electronico_txt = checkComillas(JRequest::getVar('correo_electronico_txt','','post'));
 		$numero_telefonico_txt = checkComillas(JRequest::getVar('numero_telefonico_txt','','post'));
 		$newname = checkComillas(JRequest::getVar('nombre_txt','','post'));
+
+		$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
+		$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
 
 		$secretkey = '6Lf7QAETAAAAAH1jj-pXZPuOAjFmcKfTuvCg7oI5';
 		$recaptcha = JRequest::getVar('g_recaptcha_response','','post');
@@ -77,71 +131,40 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		        $db->execute();
 				//$last_id = $db->insertid();
 
-		        /////////////ENVIAR CORREO//////////////
-				$from = 'envioprotocolosbioseguridad@suramericana.com.co';
-				//$to = array('jsanchezy@sura.com.co','kevingaviria.1994@gmail.com');
-				$to = 'botpdnredprot@suramericana.com.co';
-				$departamento_name = $ciudades_data[$departamento_residencia_txt-1]['departamento'];
-				$ciudad_name = $ciudades_data[$departamento_residencia_txt-1]['municipios'][$ciudad_residencia_txt-1]['municipio'];
+				//API URL
+				$url = 'https://prod-25.eastus.logic.azure.com:443/workflows/f3fff22925d94e01a2a99f25bf69985b/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hZJpFDfKQ0pv7_1bFU7TL6w4akm5e0J2h3GKF8KZeUI';
+				$ch = curl_init($url);
 
-				$files_path = $base."components/com_envioprotocolosbioseguridad/public/storage";
-				$folder = $tipo_documento_txt.$numero_documento_txt;
+				//setup request to send json via POST
+				$data = array(
+					'tipoDoc'=>$tipo_documento_txt,
+					'numeroDoc'=>$numero_documento_txt,
+					'nombreEmpresa'=>$nombre_comercial_txt,
+					'nombreLegalEmpresa'=>$nombre_legal_txt,
+					'sector'=>$sectores_data[$sector_txt],
+					'departamento'=>$departamento_name,
+					'municipio'=>$ciudad_name,
+					'direccion'=>$direccion_txt,
+					'correo'=>$correo_electronico_txt,
+					'celular'=>$numero_telefonico_txt,
+					'archivo'=>$newname
+				);
 				
-				$path = $files_path."/".$folder."/".$newname;
-
-				# Invocar JMail Class
-				$mailer = JFactory::getMailer();
-
-				# Seteamos quien envia el correo junto el nombre
-				$mailer->setSender($from);
-
-				# Añadimos el que recibe el correo
-				$mailer->addRecipient($to);
-
-				# Mandamos como HTML
-				$mailer->isHTML(true);
-
-				$mailer->Encoding = 'base64';
-
-				$body = '';
-				$body.='
-				<style type="text/css">
-				h1,p{
-					font-family: Arial;
-					font-size: 16px;
-					color: #111111;
-					text-align:left;
+				$payload = json_encode($data);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:text/plain'));
+				
+				$result = curl_exec($ch);
+				$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				curl_close($ch);
+				
+				if($httpcode==202||$httpcode==200){
+					exit("success");
+				}else{
+					exit(print_r($result));
 				}
-				</style>
-				<h3>Envío de Protocolos generales de Bioseguridad a la ARLSURA</h3>
-				<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus</p>
-				<br />
-				<p><b>Nombre Legal: </b>'.$nombre_legal_txt.'</p>
-				<p><b>Nombre Comercial: </b>'.$nombre_comercial_txt.'</p>
-				<p><b>NIT: </b>'.$tipo_documento_txt.$numero_documento_txt.'</p>
-				<p><b>Sector: </b>'.$sectores_data[$sector_txt].'</p>
-				<p><b>Departamento: </b>'.$departamento_name.'</p>
-				<p><b>Municipio: </b>'.$ciudad_name.'</p>
-				<p><b>Dirección: </b>'.$direccion_txt.'</p>
-				<p><b>E-mail: </b>'.$correo_electronico_txt.'</p>
-				<p><b>Número telefónico: </b>'.$numero_telefonico_txt.'</p>';
-
-				//$subject = "Solicitudes EPS - ".ucwords($_POST['numero_identificacion']);
-				//NUEVO SUBJECT
-				$subject = "Envio protocolos bioseguridad ".$tipo_documento_txt.$numero_documento_txt;
-				$mailer->setSubject($subject);
-				$mailer->setBody($body);
-
-				# Añadimos el documento como archivo adjunto
-				$mailer->addAttachment($path);
-
-				#Eviamos el correo
-				$mailer->Send();
-
-				///eliminar correo adjunto////
-				unlink($path);
-				rmdir($files_path."/".$folder);
-		        exit("success");
 			}else{
 				exit("captcha incorrecto");
 			}
@@ -149,84 +172,8 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 			exit("captcha inválido");
 		}
   	}
-
-  	function saveFile(){
-  		$base = str_replace('\\','/',JPATH_BASE)."/";
-		$files_path = $base."components/com_envioprotocolosbioseguridad/public/storage";
-
-  		$numero_documento_txt = checkComillas(JRequest::getVar('nd','','post'));
-        $tipo_documento_txt = checkComillas(JRequest::getVar('td','','post'));
-
-        if($_FILES){
-        	if($_FILES['archivo_txt']){
-        		if($_FILES['archivo_txt']['name']){
-        			if(
-        				$_FILES['archivo_txt']['type']=='image/jpg'||
-        				$_FILES['archivo_txt']['type']=='image/jpeg'||
-        				$_FILES['archivo_txt']['type']=='image/png'||
-
-        				$_FILES['archivo_txt']['type']=='application/pdf'||
-        				$_FILES['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||
-        				$_FILES['archivo_txt']['type']=='application/msword'||
-        				$_FILES['archivo_txt']['type']=='application/vnd.ms-excel'||
-        				$_FILES['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'||
-        				$_FILES['archivo_txt']['type']=='application/vnd.ms-powerpoint'||
-        				$_FILES['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.presentationml.presentation'||
-        				$_FILES['archivo_txt']['type']=='application/zip'
-        			){
-        				if($_FILES['archivo_txt']['size']<2000000){
-        					$info = pathinfo($_FILES['archivo_txt']['name']);
-							$ext = $info['extension']; // get the extension of the file
-							$newname = getNameAlias($info['filename']);
-							
-							$folder = $tipo_documento_txt.$numero_documento_txt;
-							$path = $files_path."/".$folder."/".$newname.".".$ext;
-
-							if(!file_exists($files_path."/".$folder)){
-								if(mkdir($files_path."/".$folder)){
-									if(chmod($files_path."/".$folder,0775)){
-										if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
-
-											//enviar correo
-			
-											exit('{"success":"success","msg":"'.$newname.".".$ext.'"}');
-										}else{
-											exit('{"success":"error","msg":"Error guardando el archivo"}');
-										}
-									}else{
-										exit('{"success":"error","msg":"Error modificando la carpeta"}');
-									}
-								}else{
-									exit('{"success":"error","msg":"Error creando la carpeta"}');
-								}
-							}else{
-								if(move_uploaded_file( $_FILES['archivo_txt']['tmp_name'], $path)){
-
-									//enviar correo
-	
-									exit('{"success":"success","msg":"'.$newname.".".$ext.'"}');
-								}else{
-									exit('{"success":"error","msg":"Error guardando el archivo en una carpeta ya creada"}');
-								}
-							}
-							
-        				}else{
-        					exit('{"success":"error","msg":"El archivo sobrepasa el límite de peso permitido (2M)"}');
-        				}
-        			}else{
-        				exit('{"success":"error","msg":"El formato del archivo no es válido"}');
-        			}
-        		}else{
-        			exit('{"success":"error","msg":"Error con el nombre del archivo"}');
-        		}
-        	}else{
-        		exit('{"success":"error","msg":"No se encontró el archivo"}');
-        	}
-        }else{
-        	exit('{"success":"error","msg":"No se adjuntó ningún archivo"}');
-        }
-  	}
   
+  	//genera reporte en el administrador
   	function generarReporte(){
 		$base = str_replace('\\','/',JPATH_BASE)."/";
 		$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
@@ -320,6 +267,64 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 		
 		exit($html_table);
 	}
+
+}
+
+function validarArchivo($file){
+    if($file){
+    	if($file['archivo_txt']){
+    		if($file['archivo_txt']['name']){
+    			if(
+    				$file['archivo_txt']['type']=='image/jpg'||
+    				$file['archivo_txt']['type']=='image/jpeg'||
+    				$file['archivo_txt']['type']=='image/png'||
+
+    				$file['archivo_txt']['type']=='application/pdf'||
+    				$file['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||
+    				$file['archivo_txt']['type']=='application/msword'||
+    				$file['archivo_txt']['type']=='application/vnd.ms-excel'||
+    				$file['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'||
+    				$file['archivo_txt']['type']=='application/vnd.ms-powerpoint'||
+    				$file['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.presentationml.presentation'||
+    				$file['archivo_txt']['type']=='application/zip'
+    			){
+    				if($file['archivo_txt']['size']<2000000){
+    					$info = pathinfo($file['archivo_txt']['name']);
+						$ext = $info['extension']; // get the extension of the file
+
+						//validar extencion
+						if(
+							$ext=='jpg'||
+							$ext=='png'||
+							$ext=='jpeg'||
+							$ext=='pdf'||
+							$ext=='docx'||
+							$ext=='doc'||
+							$ext=='xls'||
+							$ext=='xlsx'||
+							$ext=='ppt'||
+							$ext=='pptx'||
+							$ext=='zip'
+						){
+							return array('success'=>'success');
+						}else{
+							return array('success'=>'error','msg'=>'El formato de la extensión del archivo no es válido');
+						}
+    				}else{
+    					return array('success'=>'error','msg'=>'El archivo sobrepasa el límite de peso permitido (2M)');
+    				}
+    			}else{
+    				return array('success'=>'error','msg'=>'El formato del archivo no es válido');
+    			}
+    		}else{
+    			return array('success'=>'error','msg'=>'Error con el nombre del archivo');
+    		}
+    	}else{
+    		return array('success'=>'error','msg'=>'No se encontró el archivo');
+    	}
+    }else{
+    	return array('success'=>'error','msg'=>'No se adjuntó ningún archivo');
+    }
 }
 	
 function checkComillas($cadeneta){

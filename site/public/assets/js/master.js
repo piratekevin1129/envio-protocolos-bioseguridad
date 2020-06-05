@@ -326,7 +326,8 @@ function clickConfirmar(btn){
     $("#archivo_form").ajaxForm({
         success: function(result) {
             var result_json = JSON.parse(result)
-            if(result_json.success=='success'){
+            if(result_json.success=='success'&&result_json.code=='201'){
+
                 var nombre_txt = result_json.msg;
 
                 //////GUARDAR Y ENVIAR////////
