@@ -60,6 +60,12 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
         }
 	}
 
+	function guardarArchivoFake(){
+        $validacion_archivo = validarArchivo($_FILES);
+
+        exit(print_r($validacion_archivo));
+	}
+
 	function guardarDatos(){
 		$app = JFactory::getApplication();
 		$base = str_replace('\\','/',JPATH_BASE)."/";
@@ -153,7 +159,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
 				$payload = json_encode($data);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:text/plain'));
 				
 				$result = curl_exec($ch);
@@ -288,30 +294,50 @@ function validarArchivo($file){
     				$file['archivo_txt']['type']=='application/vnd.openxmlformats-officedocument.presentationml.presentation'||
     				$file['archivo_txt']['type']=='application/zip'
     			){
-    				if($file['archivo_txt']['size']<2000000){
-    					$info = pathinfo($file['archivo_txt']['name']);
-						$ext = $info['extension']; // get the extension of the file
 
-						//validar extencion
-						if(
-							$ext=='jpg'||
-							$ext=='png'||
-							$ext=='jpeg'||
-							$ext=='pdf'||
-							$ext=='docx'||
-							$ext=='doc'||
-							$ext=='xls'||
-							$ext=='xlsx'||
-							$ext=='ppt'||
-							$ext=='pptx'||
-							$ext=='zip'
-						){
-							return array('success'=>'success');
-						}else{
-							return array('success'=>'error','msg'=>'El formato de la extensión del archivo no es válido');
-						}
+    				$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime-type extension
+    				$tipe = finfo_file($finfo, $_FILES['archivo_txt']['tmp_name']);
+    				finfo_close($finfo);
+    				if(
+    					$tipe=='image/jpg'||
+	    				$tipe=='image/jpeg'||
+	    				$tipe=='image/png'||
+	    				$tipe=='application/pdf'||
+	    				$tipe=='application/vnd.openxmlformats-officedocument.wordprocessingml.document'||
+	    				$tipe=='application/msword'||
+	    				$tipe=='application/vnd.ms-excel'||
+	    				$tipe=='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'||
+	    				$tipe=='application/vnd.ms-powerpoint'||
+	    				$tipe=='application/vnd.openxmlformats-officedocument.presentationml.presentation'||
+	    				$tipe=='application/zip'
+    				){
+						if($file['archivo_txt']['size']<2000000){
+	    					$info = pathinfo($file['archivo_txt']['name']);
+							$ext = $info['extension']; // get the extension of the file
+
+							//validar extencion
+							if(
+								$ext=='jpg'||
+								$ext=='png'||
+								$ext=='jpeg'||
+								$ext=='pdf'||
+								$ext=='docx'||
+								$ext=='doc'||
+								$ext=='xls'||
+								$ext=='xlsx'||
+								$ext=='ppt'||
+								$ext=='pptx'||
+								$ext=='zip'
+							){
+								return array('success'=>'success','tipe'=>$tipe);
+							}else{
+								return array('success'=>'error','msg'=>'El formato de la extensión del archivo no es válido');
+							}
+	    				}else{
+	    					return array('success'=>'error','msg'=>'El archivo sobrepasa el límite de peso permitido (2M)');
+	    				}
     				}else{
-    					return array('success'=>'error','msg'=>'El archivo sobrepasa el límite de peso permitido (2M)');
+						return array('success'=>'error','msg'=>'El formato del archivo es raro');
     				}
     			}else{
     				return array('success'=>'error','msg'=>'El formato del archivo no es válido');

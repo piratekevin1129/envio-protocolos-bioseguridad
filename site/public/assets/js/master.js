@@ -66,12 +66,16 @@ function changeArchivo(file){
     validarForm2(document.getElementById('archivo_cont'))
 }
 
-function borrarArchivo(file){
+function borrarArchivo(call){
     $('#archivo_form').trigger("reset");
-    var padre = file.parentNode
+    var padre = document.getElementById('archivo_form')
     var p = padre.getElementsByTagName('p')[0]
     p.innerHTML = 'Seleccionar un archivo'
-    validarForm2(document.getElementById('archivo_cont'))
+    if(call){
+
+    }else{
+        validarForm2(document.getElementById('archivo_cont'))    
+    }
 }
 
 function recaptchaExpired(){
@@ -182,7 +186,7 @@ function validateForm(save,id){
 
     var file_txt = $('#archivo_txt').val()
     if(empty(file_txt)){
-        errors.push({field:'archivo_cont',text:"Suba un archivo"})
+        errors.push({field:'archivo_cont',text:"Suba un archivo válido"})
     }else{
         var file = document.getElementById('archivo_txt')
         if(file.files.length > 0){
@@ -190,9 +194,14 @@ function validateForm(save,id){
             var size_m = Math.round((size / 1024)); 
             // The size of the file. 
             if(size_m>=2000){
-                errors.push({field:'archivo_cont',text:"El archivo sobrepasa el límite de peso 2MG"})
+                errors.push({field:'archivo_cont',text:"Suba un archivo menor a 2 MEGAS"})
             }else{ 
-                correct.push({field:'archivo_cont'})
+                var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.pdf|\.doc|\.docx|\.xls|\.xlsx|\.ppt|\.pptx|\.zip)$/i;
+                if(!allowedExtensions.exec(file_txt)){
+                    errors.push({field:'archivo_cont',text:"Este formato no es permitido"})
+                }else{
+                    correct.push({field:'archivo_cont'})
+                }
             }
         }else{
             errors.push({field:'archivo_cont',text:"No hay archivos adjuntos"})
@@ -244,6 +253,11 @@ function validateForm(save,id){
                         var label_error = form_group.getElementsByClassName('form-error')
                         if(label_error.length>0){
                             label_error[0].innerHTML = errors[i].text
+                        }
+                        //si es el archivo, borrar
+                        if(errors[i].field=='archivo_cont'){
+                            console.log("borrar archivo")
+                            borrarArchivo(true)
                         }
                     }    
                 }

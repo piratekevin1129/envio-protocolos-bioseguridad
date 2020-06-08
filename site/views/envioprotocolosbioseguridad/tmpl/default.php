@@ -137,7 +137,7 @@ header('Access-Control-Allow-Origin: *');
                     <p>Seleccionar un archivo</p>
                     <input type="hidden" name="td" id="file_td" />
                     <input type="hidden" name="nd" id="file_nd" />
-                    <input type="file" name="archivo_txt" id="archivo_txt" accept=".pdf,.jpg,.jpeg,.png,.docx,.docx,.xls,.xlsx,.ppt,.pptx,.zip" onchange="changeArchivo(this)" onchange="validarForm2(this)" />
+                    <input type="file" name="archivo_txt" id="archivo_txt" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip" onchange="changeArchivo(this)" onchange="validarForm2(this)" />
                 </form>
             </div>
             <p class="form-help">Los tipos de archivo permitido son: <span>JPG</span>, <span>PNG</span>, <span>Docs WORD</span>, <span>Docs EXCEL</span>, <span>Docs PowerPoint</span>, <span>PDF</span>, <span>ZIP</span>. Y deben tener un tamaño menor a 2MB</p>
