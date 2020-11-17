@@ -203,6 +203,12 @@
     padding: 0px;
     margin-bottom: 8px;
 }
+.form-label-2{
+    width: 70%;
+}
+#contenedor_principal .form-label > span{
+    font-family: 'Barlow-Bold';
+}
 
 #contenedor_principal .form-input-file{
     position: relative;
@@ -317,6 +323,9 @@
     padding: 0px;
     margin-bottom: 8px;
 }
+#contenedor_principal .form-texto > span{
+    font-family: 'Barlow-Bold';
+}
 #contenedor_principal .form-value{
     font-family: 'Barlow-Medium';
     font-size: 18px;
@@ -332,7 +341,7 @@
 }
 #contenedor_principal .form-help{
     font-family: 'Barlow-Regular';
-    font-size: 13px;
+    font-size: 14px;
     color: #666666;
     text-align: left;
     font-weight: normal;

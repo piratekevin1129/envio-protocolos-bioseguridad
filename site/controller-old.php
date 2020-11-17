@@ -16,7 +16,7 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
         //$tipo_documento_txt = 'N';
 
         $validacion_archivo = validarArchivo($_FILES);
-        if($validacion_archivo['success']=='success'){
+        if($validacion_archivo['success']){
 			$info = pathinfo($_FILES['archivo_txt']['name']);
 			$ext = $info['extension']; // get the extension of the file
 			$newname = getNameAlias($info['filename']);
@@ -181,145 +181,97 @@ class EnvioprotocolosbioseguridadController extends JControllerLegacy{
   
   	//genera reporte en el administrador
   	function generarReporte(){
-  		$usuario = checkComillas(JRequest::getVar('usuario','','post'));
-  		$contrasena = checkComillas(JRequest::getVar('contrasena','','post'));
+		$base = str_replace('\\','/',JPATH_BASE)."/";
+		$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
+		$file = file_get_contents($ciudades_url);
+		$ciudades_data = json_decode($file,true);
+		
+		$db = JFactory::getDBO();
+		$query_info = $db->getQuery(true);
 
-  		if($usuario=='adminarl'&&$contrasena=='adminarl2020'){
-			$base = str_replace('\\','/',JPATH_BASE)."/";
-			$ciudades_url = $base."components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json";
-			$file = file_get_contents($ciudades_url);
-			$ciudades_data = json_decode($file,true);
+		$query_info->select($db->quoteName(array('id','tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono')));
+		$query_info->from($db->quoteName('#__envioprotocolosbioseguridad'));
+		//$query_info->where($db->quoteName('nit_empresa').' = '.$db->quote($nit));
+		$db->setQuery($query_info);		
+		$datos = $db->loadObjectList();
+		/////////////////////////////////////
+
+		$tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+		$tab_text.='<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+		$tab_text.='<x:Name>Inventario de tareas</x:Name>';
+		$tab_text.='<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
+		$tab_text.='</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>';
 			
-			$db = JFactory::getDBO();
-			$query_info = $db->getQuery(true);
+		$html_table = $tab_text;
+		$html_table.='
+		<table border="1">
+			<tr>
+				<td> 
+					<table border="1">
+						<tr>
+							'.renderTableSubtitulo("Envio protocolos bioseguridad").'
+						</tr>
+						<tr>
+							<td>
+								<table border="1">
+									<tr>';
+										$html_table.=renderTablePregunta("Id");
+										$html_table.=renderTablePregunta("Nombre Legal");
+										$html_table.=renderTablePregunta("Nombre Comercial");
+										$html_table.=renderTablePregunta("Documento");
+										$html_table.=renderTablePregunta("Sector");
+										$html_table.=renderTablePregunta("Departamento");
+										$html_table.=renderTablePregunta("Ciudad");
+										$html_table.=renderTablePregunta("Email");
+										$html_table.=renderTablePregunta("Domicilio");
+										$html_table.=renderTablePregunta("Teléfono Celular");
+										$html_table.=renderTablePregunta("Fecha registro");
+									$html_table.='</tr>';
+									
+									foreach($datos as $dato){
+										$html_table.='<tr>';
+										$html_table.=renderTableTexto($dato->id);
+										$html_table.=renderTableTexto($dato->nombre_legal);
+										$html_table.=renderTableTexto($dato->nombre_comercial);
+										$html_table.=renderTableTexto($dato->tipo_documento.'.'.$dato->numero_documento);
+										$html_table.=renderTableTexto($dato->sector_economico);
 
-			$query_info->select($db->quoteName(array('id','tipo_documento','numero_documento','nombre_comercial','nombre_legal','sector_economico','departamento_residencia','ciudad_residencia','direccion_correspondencia','correo_electronico','numero_telefono')));
-			$query_info->from($db->quoteName('#__envioprotocolosbioseguridad'));
-			//$query_info->where($db->quoteName('nit_empresa').' = '.$db->quote($nit));
-			$db->setQuery($query_info);		
-			$datos = $db->loadObjectList();
-			/////////////////////////////////////
+										$departamento_name = $ciudades_data[$dato->departamento_residencia-1]['departamento'];
+										$html_table.=renderTableTexto($departamento_name);
+										$ciudad_name = $ciudades_data[$dato->departamento_residencia-1]['municipios'][$dato->ciudad_residencia-1]['municipio'];
+										$html_table.=renderTableTexto($ciudad_name);
 
-			$tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
-			$tab_text.='<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
-			$tab_text.='<x:Name>Inventario de tareas</x:Name>';
-			$tab_text.='<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
-			$tab_text.='</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>';
-				
-			$html_table = $tab_text;
-			$html_table.='
-			<table border="1">
-				<tr>
-					<td> 
-						<table border="1">
-							<tr>
-								'.renderTableSubtitulo("Envio protocolos bioseguridad").'
-							</tr>
-							<tr>
-								<td>
-									<table border="1">
-										<tr>';
-											$html_table.=renderTablePregunta("Id");
-											$html_table.=renderTablePregunta("Nombre Legal");
-											$html_table.=renderTablePregunta("Nombre Comercial");
-											$html_table.=renderTablePregunta("Documento");
-											$html_table.=renderTablePregunta("Sector");
-											$html_table.=renderTablePregunta("Departamento");
-											$html_table.=renderTablePregunta("Ciudad");
-											$html_table.=renderTablePregunta("Email");
-											$html_table.=renderTablePregunta("Domicilio");
-											$html_table.=renderTablePregunta("Teléfono Celular");
-											$html_table.=renderTablePregunta("Fecha registro");
+										$html_table.=renderTableTexto($dato->correo_electronico,false);
+										$html_table.=renderTableTexto($dato->direccion_correspondencia);
+										$html_table.=renderTableTexto($dato->numero_telefono);
+										$html_table.=renderTableTexto($dato->fecha_registro);
 										$html_table.='</tr>';
-										
-										foreach($datos as $dato){
-											$html_table.='<tr>';
-											$html_table.=renderTableTexto($dato->id);
-											$html_table.=renderTableTexto($dato->nombre_legal);
-											$html_table.=renderTableTexto($dato->nombre_comercial);
-											$html_table.=renderTableTexto($dato->tipo_documento.'.'.$dato->numero_documento);
-											$html_table.=renderTableTexto($dato->sector_economico);
+									}
+								$html_table.='</table>';
+							$html_table.='</td>';
+						$html_table.='</tr>';
+					$html_table.='</table>';
+				$html_table.='</td>';
+			$html_table.='</tr>';
+		$html_table.='</table>';
 
-											$departamento_name = $ciudades_data[$dato->departamento_residencia-1]['departamento'];
-											$html_table.=renderTableTexto($departamento_name);
-											$ciudad_name = $ciudades_data[$dato->departamento_residencia-1]['municipios'][$dato->ciudad_residencia-1]['municipio'];
-											$html_table.=renderTableTexto($ciudad_name);
+		$html_table.='</body></html>';
 
-											$html_table.=renderTableTexto($dato->correo_electronico,false);
-											$html_table.=renderTableTexto($dato->direccion_correspondencia);
-											$html_table.=renderTableTexto($dato->numero_telefono);
-											$html_table.=renderTableTexto($dato->fecha_registro);
-											$html_table.='</tr>';
-										}
-									$html_table.='</table>';
-								$html_table.='</td>';
-							$html_table.='</tr>';
-						$html_table.='</table>';
-					$html_table.='</td>';
-				$html_table.='</tr>';
-			$html_table.='</table>';
+		ob_end_clean();
+		JResponse::clearHeaders();
+		JResponse::setHeader('Content-type', 'application/vnd.ms-excel', true);
+		JResponse::setHeader('Content-Disposition', 'attachment; filename=reporte_envio_protocolos_bioseguridad'.$nit.'.xls', true);
+		JResponse::setHeader('Pragma', 'no-cache', true);
+		JResponse::setHeader('Expires', '0', true);
+		JResponse::sendHeaders();
 
-			$html_table.='</body></html>';
-
-			ob_end_clean();
-			JResponse::clearHeaders();
-			JResponse::setHeader('Content-type', 'application/vnd.ms-excel', true);
-			JResponse::setHeader('Content-Disposition', 'attachment; filename=reporte_envio_protocolos_bioseguridad'.$nit.'.xls', true);
-			JResponse::setHeader('Pragma', 'no-cache', true);
-			JResponse::setHeader('Expires', '0', true);
-			JResponse::sendHeaders();
-
-			/*ob_end_clean();
-			JResponse::clearHeaders();
-			JResponse::setHeader('Content-type', 'text/html; charset=utf-8', true);
-			JResponse::setHeader('Content-type', 'text/html', true);
-			JResponse::sendHeaders();*/
-			
-			exit($html_table);
-		}else{
-  			$html = '<style type="text/css">
-  			p{
-  				font-family:Arial;
-  				font-size:14px;
-  				color:#333333;
-  				text-align:left;
-  				width:200px;
-  				height:30px;
-  				line-height:40px;
-  				margin:0px;
-  				padding:0px;
-  			}
-  			input[type=text],
-  			input[type=password]{
-  				width:200px;
-  				height:30px;
-  				border:#0033A0 solid 1px;
-  				font-family:Arial;
-  				font-size:14px;
-  				color:#666666;
-  				text-align:left;
-  				padding:0px 10px;
-  				box-sizing:border-box;
-  				margin:0px;
-  				background-color: #FFFFFF;
-  			}
-  			input[type=submit]{
-  				width: 80px;
-  				height: 30px;
-  				font-family:Arial;
-  				margin-top: 10px;
-  			}
-  			</style>
-  			<form id="formulario" action="https://www.arlsura.com/index.php?option=com_envioprotocolosbioseguridad&task=generarReporte" method="post">
-  			<p>Usuario</p>
-  			<input type="text" name="usuario" autocomplete="off" />
-  			<p>Contraseña</p>
-  			<input type="password" name="contrasena" autocomplete="off" />
-  			<br />
-  			<input type="submit" value="ENVIAR" />
-  			</form>';
-  			exit($html);
-  		}
+		/*ob_end_clean();
+		JResponse::clearHeaders();
+		JResponse::setHeader('Content-type', 'text/html; charset=utf-8', true);
+		JResponse::setHeader('Content-type', 'text/html', true);
+		JResponse::sendHeaders();*/
+		
+		exit($html_table);
 	}
 
 }
@@ -343,7 +295,7 @@ function validarArchivo($file){
     				$file['archivo_txt']['type']=='application/zip'
     			){
 
-    				/*$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime-type extension
+    				$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime-type extension
     				$tipe = finfo_file($finfo, $_FILES['archivo_txt']['tmp_name']);
     				finfo_close($finfo);
     				if(
@@ -357,9 +309,8 @@ function validarArchivo($file){
 	    				$tipe=='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'||
 	    				$tipe=='application/vnd.ms-powerpoint'||
 	    				$tipe=='application/vnd.openxmlformats-officedocument.presentationml.presentation'||
-	    				$tipe=='application/zip'||
-	    				$tipe=='application/octet-stream'
-    				){*/
+	    				$tipe=='application/zip'
+    				){
 						if($file['archivo_txt']['size']<2000000){
 	    					$info = pathinfo($file['archivo_txt']['name']);
 							$ext = $info['extension']; // get the extension of the file
@@ -378,16 +329,16 @@ function validarArchivo($file){
 								$ext=='pptx'||
 								$ext=='zip'
 							){
-								return array('success'=>'success','tipe'=>$file['archivo_txt']['type']);
+								return array('success'=>'success','tipe'=>$tipe);
 							}else{
 								return array('success'=>'error','msg'=>'El formato de la extensión del archivo no es válido');
 							}
 	    				}else{
 	    					return array('success'=>'error','msg'=>'El archivo sobrepasa el límite de peso permitido (2M)');
 	    				}
-    				/*}else{
-						return array('success'=>'error','msg'=>'El formato del archivo es raro '.$tipe);
-    				}*/
+    				}else{
+						return array('success'=>'error','msg'=>'El formato del archivo es raro');
+    				}
     			}else{
     				return array('success'=>'error','msg'=>'El formato del archivo no es válido');
     			}
@@ -430,39 +381,6 @@ function getNameAlias($name){
 	$new_name = str_replace(" ","_",$new_name);
 	$new_name = strtolower($new_name);
 	return $new_name;
-}
-
-function renderTableTitulo($titulo){
-	//$titulo = strtoupper($titulo);
-	return '<td style="background-color:#eeece1;" align="center"><p style="font-size:20px; color:#95c113;"><b>'.convertExcel($titulo).'</b></p></td>';
-}
-
-function renderTableSubtitulo($titulo){
-	//$titulo = strtoupper($titulo);
-	return '<td style="background-color:#eeece1;" align="center"><p style="font-size:18px; color:#000000;"><b>'.convertExcel($titulo).'</b></p></td>';
-}
-
-function renderTablePregunta($texto){
-	//$texto = strtoupper($texto);
-	$str = str_replace("<b>","",$texto);
-	$str = str_replace("</b>","",$str);
-	$str = str_replace("<br />","",$str);
-	return '<td style="background-color:#FFFFFF;" valign="top" align="center"><p style="font-size:16px; color:#000000;">'.convertExcel($str).'</p></td>';
-}
-
-function renderTableTexto($palabra,$mayus = true){
-	$texto = "";
-	if($mayus){
-		$texto = strtoupper($palabra);
-	}else{
-		$texto = $palabra;
-	}
-	//$texto = strtoupper($texto);
-	return '<td align="center"><p style="font-size:14px; color:#000000;">'.convertExcel($texto).'</p></td>';
-}
-
-function convertExcel($value){
-	return mb_convert_encoding($value,'utf-16','utf-8');
 }
 
 ?>

@@ -10,8 +10,9 @@ header('Access-Control-Allow-Origin: *');
    
     <!--Jquery-->
     <!--<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" crossorigin="anonymous"></script>-->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" crossorigin="anonymous"></script>
+    
+    <script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/jquery.form.js" crossorigin="anonymous"></script>
+        
 
     <!--Bootstrap-->
     <!--CDN-->
@@ -62,14 +63,16 @@ header('Access-Control-Allow-Origin: *');
                 <option value="C">CEDULA</option>
                 <option value="N">NIT</option>
             </select>
+            
             <p class="form-error"></p>
         <!--</div>-->
         </div>  
 
         <div class="form-group">
         <!--<div class="form-subgroup form-subgroup-70 form-subgroup-pl">-->
-            <p class="form-label">Número Doc / NIT *</p>
-            <input id="numero_documento_txt" class="form-input" placeholder="Número de cédula o NIT" autocomplete="off" type="text" maxlength="20" onblur="validarForm2(this)" onkeyup="validarForm(this)" />
+            <p class="form-label form-label-2">Número Doc / NIT <span>sin dígito de verificación *</span></p>
+            <input id="numero_documento_txt" class="form-input" placeholder="Número de cédula o NIT" autocomplete="off" type="text" maxlength="20" onfocus="validarNit(this,false)" onblur="validarNit(this,true)" onkeyup="validarNit(this,false)" />
+            <p class="form-help"></p>
             <p class="form-error"></p>
         <!--</div>-->
         </div>
@@ -165,7 +168,7 @@ header('Access-Control-Allow-Origin: *');
         <br />
             
         <div class="form-group">
-            <p class="form-texto">Número de cédula / NIT</p>
+            <p class="form-texto">Número de cédula / NIT <span>sin dígito de verificación *</p>
             <p class="form-value" id="documento_value"></p>
         </div>  
 
@@ -243,42 +246,12 @@ header('Access-Control-Allow-Origin: *');
 </div>
 
 <script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/validation.js"></script>
-<script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/master.js"></script>
+<script src="<?php echo JURI::base(); ?>components/com_envioprotocolosbioseguridad/public/assets/js/master_new.js?action=getTime&bogus=<?php echo rand(100,999)?>"></script>
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
 
 var ciudades_data = null
 var sectores_data = null
-
-window.onload = function(){
-    //resizeContainer()
-    $.ajax ({ 
-        url: '/components/com_envioprotocolosbioseguridad/public/assets/js/municipios.json', 
-        method: "GET",
-        success: function(response){
-            //console.log(response)
-            ciudades_data = response;
-            fillDepartamentos()
-        },
-        error: function (xhr){
-            console.log("error loading json")
-            console.log(xhr)
-        }
-    })
-    $.ajax({
-        url: '/components/com_envioprotocolosbioseguridad/public/assets/js/sectores.json', 
-        method: "GET",
-        success: function(response){
-            //console.log(response)
-            sectores_data = response;
-            fillSectores()
-        },
-        error: function (xhr){
-            console.log("error loading json")
-            console.log(xhr)
-        }
-    })
-}
 
 </script>
 </body>

@@ -134,6 +134,7 @@
 
     #contenedor_principal .form-label{
         font-size: 14px;
+        width: 100%;
     }
     #contenedor_principal .form-texto{
         font-size: 14px;
